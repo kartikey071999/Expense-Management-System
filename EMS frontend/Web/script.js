@@ -4,7 +4,7 @@ const expensesList = document.getElementById('expenses-list');
 // Function to fetch expenses from the backend and render them
 async function fetchAndRenderExpenses() {
     // You should replace this URL with the actual URL of your FastAPI backend
-    const apiUrl = 'https://your-fastapi-backend.com/expenses';
+    const apiUrl = 'http://127.0.0.1:8000/expenses/read';
 
     try {
         const response = await fetch(apiUrl);
@@ -15,7 +15,7 @@ async function fetchAndRenderExpenses() {
         expenses.forEach(expense => {
             const expenseItem = document.createElement('div');
             expenseItem.classList.add('expense-item');
-            expenseItem.textContent = `${expense.description} - $${expense.amount} (${expense.category})`;
+            expenseItem.textContent = `${expense.name} - $${expense.amount}`;
             expensesList.appendChild(expenseItem);
         });
     } catch (error) {
@@ -25,12 +25,11 @@ async function fetchAndRenderExpenses() {
 
 expenseForm.addEventListener('submit', async function(event) {
     event.preventDefault();
-    const description = document.getElementById('description').value;
+    const name = document.getElementById('name').value;
     const amount = parseFloat(document.getElementById('amount').value);
-    const category = document.getElementById('category').value;
 
     // You should replace this URL with the actual URL of your FastAPI backend
-    const apiUrl = 'https://your-fastapi-backend.com/add-expense';
+    const apiUrl = 'http://127.0.0.1:8000/expenses/create';
 
     try {
         const response = await fetch(apiUrl, {
@@ -39,9 +38,8 @@ expenseForm.addEventListener('submit', async function(event) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                description,
-                amount,
-                category
+                name,
+                amount
             })
         });
         if (response.ok) {
