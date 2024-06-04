@@ -1,4 +1,3 @@
-# schemas.py
 from pydantic import BaseModel
 
 class ExpenseBase(BaseModel):
@@ -12,4 +11,4 @@ class Expense(ExpenseBase):
     id: int
 
     class Config:
-        orm_mode = True
+        orm_mode: True

@@ -28,8 +28,9 @@ async def create_expense(expense: schemas.ExpenseCreate, db: Session = Depends(g
 
 @app.get("/expenses/read", response_model=List[schemas.Expense])
 def read_expenses(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return db.query(models.Expense).offset(skip).limit(limit).all()
+    expenses = db.query(models.Expense).offset(skip).limit(limit).all()
+    return expenses
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
