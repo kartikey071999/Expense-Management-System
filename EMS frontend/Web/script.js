@@ -1,13 +1,26 @@
 const expenseForm = document.getElementById('expense-form');
 const expensesList = document.getElementById('expenses-list');
+const messageDiv = document.getElementById('message');
+
+// Function to show a message
+function showMessage(message, isSuccess = true) {
+    messageDiv.textContent = message;
+    messageDiv.className = isSuccess ? 'success' : 'error';
+    messageDiv.style.display = 'block';
+    setTimeout(() => {
+        messageDiv.style.display = 'none';
+    }, 3000);
+}
 
 // Function to fetch expenses from the backend and render them
 async function fetchAndRenderExpenses() {
-    // You should replace this URL with the actual URL of your FastAPI backend
-    const apiUrl = 'https://your-fastapi-backend.com/expenses';
+    const apiUrl = 'http://127.0.0.1:8000/expenses/read';
 
     try {
         const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Failed to fetch expenses');
+        }
         const expenses = await response.json();
 
         expensesList.innerHTML = ''; // Clear previous expenses
@@ -15,22 +28,21 @@ async function fetchAndRenderExpenses() {
         expenses.forEach(expense => {
             const expenseItem = document.createElement('div');
             expenseItem.classList.add('expense-item');
-            expenseItem.textContent = `${expense.description} - $${expense.amount} (${expense.category})`;
+            expenseItem.textContent = `${expense.name} - $${expense.amount}`;
             expensesList.appendChild(expenseItem);
         });
     } catch (error) {
+        showMessage('Error fetching expenses: ' + error.message, false);
         console.error('Error fetching expenses:', error);
     }
 }
 
 expenseForm.addEventListener('submit', async function(event) {
     event.preventDefault();
-    const description = document.getElementById('description').value;
+    const name = document.getElementById('description').value;
     const amount = parseFloat(document.getElementById('amount').value);
-    const category = document.getElementById('category').value;
 
-    // You should replace this URL with the actual URL of your FastAPI backend
-    const apiUrl = 'https://your-fastapi-backend.com/add-expense';
+    const apiUrl = 'http://127.0.0.1:8000/expenses/create';
 
     try {
         const response = await fetch(apiUrl, {
@@ -39,18 +51,17 @@ expenseForm.addEventListener('submit', async function(event) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                description,
-                amount,
-                category
+                name,
+                amount
             })
         });
-        if (response.ok) {
-            // If the expense was successfully added, fetch and render updated expenses
-            fetchAndRenderExpenses();
-        } else {
-            console.error('Failed to add expense:', response.statusText);
+        if (!response.ok) {
+            throw new Error('Failed to add expense');
         }
+        showMessage('Expense added successfully');
+        fetchAndRenderExpenses();
     } catch (error) {
+        showMessage('Error adding expense: ' + error.message, false);
         console.error('Error adding expense:', error);
     }
 });
